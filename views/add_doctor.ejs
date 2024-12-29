@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create User</title>
+  <style>
+    /* Same styles as before */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      height: 100vh;
+      position: fixed;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+      color: #fff;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 10px;
+      margin: 10px 0;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    .sidebar a:hover {
+      background-color: #575757;
+      border-radius: 5px;
+    }
+
+    .main-content {
+      margin-left: 270px;
+      padding: 40px;
+      flex: 1;
+      background-color: #f4f4f4;
+    }
+
+    .main-content h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    form {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 10px 0 5px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #575757;
+    }
+
+    @media screen and (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Admin Dashboard</h2>
+    <a href="/admin/dashboard">Dashboard</a>
+    <a href="/admin/dashboard/create-user">Create User</a>
+    <a href="/admin/dashboard/add-doctors">Add doctor</a> 
+    <a href="/admin/dashboard/list-doctors">List Doctors</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <div class="main-content">
+
+<h2>Add New Doctor</h2>
+<form action="/admin/dashboard/add-doctors"  method="POST">
+  <label for="first_name">First Name:</label>
+  <input type="text" name="first_name" required><br><br>
+
+  <label for="last_name">Last Name:</label>
+  <input type="text" name="last_name" required><br><br>
+
+  <label for="specialization">Specialization:</label>
+  <input type="text" name="specialization" required><br><br>
+
+  <label for="email">Email:</label>
+  <input type="email" name="email" required><br><br>
+  
+  <label for="password">Password</label>
+  <input type="password" name="password" placeholder="Password" required>
+
+  <label for="phone">Phone:</label>
+  <input type="text" name="phone" required><br><br>
+
+  <label for="schedule">Schedule (JSON Format):</label>
+  <textarea name="schedule" rows="4" cols="50"></textarea><br><br>
+
+  <button type="submit">Add Doctor</button>
+</form>
+</div>
+</body>
+</html>

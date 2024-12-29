@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat with Dr. <%= doctor.first_name %> <%= doctor.last_name %></title>
+  <script src="/socket.io/socket.io.js"></script> <!-- Socket.io for real-time communication -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery -->
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f7fb;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: white;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      padding-top: 20px;
+      padding-left: 15px;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 15px;
+      text-decoration: none;
+      font-size: 18px;
+      transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #575757;
+      border-radius: 5px;
+    }
+
+    .sidebar .active {
+      background-color: #ff6347;
+      border-radius: 5px;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      margin-left: 250px;
+      padding: 40px;
+      flex-grow: 1;
+      background-color: #f9f9f9;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* Chat Container */
+    .chat-box {
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background-color: #fff;
+      padding: 20px;
+      width: 60%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    /* Message Styling */
+    .message {
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      line-height: 1.4;
+      max-width: 75%;
+      word-wrap: break-word;
+    }
+
+    /* Patient's Message */
+    .patient {
+      background-color: #e1ffe1;
+      text-align: right;
+      margin-left: auto;
+    }
+
+    /* Doctor's Message */
+    .doctor {
+      background-color: #f0f0f0;
+      text-align: left;
+      margin-right: auto;
+    }
+
+    /* Message Input and Button */
+    .input-container {
+      display: flex;
+      justify-content: space-between;
+      width: 60%;
+      margin-top: 20px;
+    }
+
+    #message-input {
+      width: 80%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    #message-input:focus {
+      border-color: #ff6347;
+    }
+
+    #send-btn {
+      background-color: #ff6347;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #send-btn:hover {
+      background-color: #e55347;
+    }
+
+    /* New Message Notification */
+    #new-message-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #ff6347;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      display: none;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Scroll Bar Customization */
+    .chat-box::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .chat-box::-webkit-scrollbar-thumb {
+      background-color: #ddd;
+      border-radius: 4px;
+    }
+
+    .chat-box::-webkit-scrollbar-track {
+      background-color: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Patient Dashboard</h2>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/book-appointment">Book Appointment</a>
+    <a href="/appointment">View Appointments</a>
+    <a href="/updateprofile">Update Profile</a>
+    <a href="/patient/select-doctor">Chat with Doctor</a>
+    <a href="#" id="delete-account-link">Delete Account</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <h1>Chat with Dr. <%= doctor.first_name %> <%= doctor.last_name %></h1>
+
+    <div id="chat-box" class="chat-box">
+      <!-- Display chat history here -->
+      <% messages.forEach(function(message) { %>
+        <div class="message <%= message.sender %>" data-message-id="<%= message.id %>">
+          <strong><%= message.sender %>:</strong> <%= message.message %> <br>
+          <small><%= message.timestamp %></small>
+        </div>
+      <% }); %>
+    </div>
+
+    <div class="input-container">
+      <input type="text" id="message-input" placeholder="Type your message...">
+      <button id="send-btn">Send</button>
+    </div>
+
+    <!-- New message notification -->
+    <div id="new-message-notification">New Message!</div>
+  </div>
+
+  <script>
+    const socket = io.connect(); // Ensure Socket.IO is properly connected
+    const chatBox = document.getElementById('chat-box');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-btn');
+    const notification = document.getElementById('new-message-notification');
+  
+    // Use the patientId and doctorId passed from EJS template
+    const doctorId = '<%= doctorId %>';
+    const patientId = '<%= patientId %>';  // Do NOT redeclare the variable here!
+  
+    // Emit join event with patientId to track user
+    socket.emit('join', patientId);
+  
+    sendButton.addEventListener('click', async () => {
+      const messageText = messageInput.value.trim();
+      if (messageText === '') return;
+  
+      try {
+        const response = await fetch('/patient/chat/send-message', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ doctorId, patientId, text: messageText }),
+        });
+  
+        const data = await response.json();
+        if (data.success) {
+          // Display message in chat box
+          const newMessage = document.createElement('div');
+          newMessage.classList.add('message', 'patient');
+          newMessage.innerText = messageText;
+          chatBox.appendChild(newMessage);
+          messageInput.value = '';
+          chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom of chat
+        }
+      } catch (err) {
+        console.error('Error sending message:', err);
+      }
+    });
+  
+    // Listen for incoming messages from the server
+    socket.on('receiveMessage', (data) => {
+      const newMessage = document.createElement('div');
+      newMessage.classList.add('message', 'doctor');
+      newMessage.innerText = data.message;
+      chatBox.appendChild(newMessage);
+      chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+  
+      // Show notification for new message
+      notification.style.display = 'block';
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 3000);
+    });
+  
+    // On the client side: Mark messages as read when they are visible
+    $(document).ready(function () {
+      // You do NOT need to declare patientId and doctorId here again.
+      // They are already passed from the server via EJS
+  
+      // Function to check if an element is in the viewport
+      function isElementInView(el) {
+        const rect = el.getBoundingClientRect();
+        return (
+          rect.top >= 0 &&
+          rect.left >= 0 &&
+          rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+          rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+      }
+  
+      // When a message is visible, mark it as read
+      $('.message').each(function () {
+        if (isElementInView(this)) {
+          const messageId = $(this).data('message-id');
+          markMessageAsRead(patientId, doctorId, messageId);
+        }
+      });
+  
+      function markMessageAsRead(patientId, doctorId, messageId) {
+        $.post('/patient/chat/mark-read', { patientId, doctorId, messageId }, function (response) {
+          if (response.success) {
+            console.log('Message marked as read');
+          } else {
+            console.log('Error marking message as read');
+          }
+        });
+      }
+    });
+  </script>
+  

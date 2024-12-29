@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>List of Doctors</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      height: 100vh;
+      position: fixed;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+      color: #fff;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 10px;
+      margin: 10px 0;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    .sidebar a:hover {
+      background-color: #575757;
+      border-radius: 5px;
+    }
+
+    .main-content {
+      margin-left: 270px;
+      padding: 40px;
+      flex: 1;
+      background-color: #f4f4f4;
+    }
+
+    .main-content h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      margin: 20px 0;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    td a {
+      color: #333;
+      text-decoration: none;
+    }
+
+    td a:hover {
+      color: #007BFF;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .actions a {
+      padding: 5px 10px;
+      border-radius: 5px;
+      text-decoration: none;
+      color: #fff;
+      background-color: #007BFF;
+    }
+
+    .actions a:hover {
+      background-color: #0056b3;
+    }
+
+    @media screen and (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 20px;
+      }
+    }
+  </style>
+   <script>
+    function confirmDelete(id) {
+      const confirmation = confirm("Are you sure you want to delete this doctor?");
+      if (confirmation) {
+        window.location.href = '/admin/delete-doctor/' + id;
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Admin Dashboard</h2>
+    <a href="/admin/dashboard">Dashboard</a>
+    <a href="/admin/dashboard/create-user">Create User</a>
+    <a href="/admin/dashboard/add-doctors">Add Doctor</a>
+    <a href="/admin/dashboard/list-doctors">List Doctors</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <div class="main-content">
+    <h1>List of Doctors</h1>
+
+    <!-- Doctors Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Specialization</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% doctors.forEach(doctor => { %>
+          <tr>
+            <td><%= doctor.id %></td>
+            <td><%= doctor.first_name %> <%= doctor.last_name %></td>
+            <td><%= doctor.specialization %></td>
+            <td><%= doctor.email %></td>
+            <td><%= doctor.phone %></td>
+
+            <td class="actions">
+              <a href="/admin/edit-doctor/<%= doctor.id %>">Edit</a>
+              <a href="javascript:void(0)" class="delete-btn" onclick="confirmDelete('<%= doctor.id %>')">Delete</a>
+             
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>
+
+

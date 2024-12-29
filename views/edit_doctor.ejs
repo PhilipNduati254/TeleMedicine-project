@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Doctor Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    /* Sidebar styling */
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      height: 100vh;
+      position: fixed;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+      color: #fff;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 10px;
+      margin: 10px 0;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    .sidebar a:hover {
+      background-color: #575757;
+      border-radius: 5px;
+    }
+
+    /* Main content area styling */
+    .main-content {
+      margin-left: 270px;
+      padding: 40px;
+      flex: 1;
+      background-color: #f4f4f4;
+    }
+
+    .main-content h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    label {
+      font-size: 16px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0 20px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    /* Responsive styling */
+    @media screen and (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 20px;
+      }
+
+      form {
+        width: 100%;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Admin Dashboard</h2>
+    <a href="/admin/dashboard">Dashboard</a>
+    <a href="/admin/dashboard/create-user">Create User</a>
+    <a href="/admin/dashboard/add-doctors">Add Doctor</a>
+    <a href="/admin/dashboard/list-doctors">List Doctors</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <h1>Edit Doctor Details</h1>
+
+    <!-- Form for editing doctor details -->
+    <form action="/admin/edit-doctor/<%= doctor.id %>" method="POST">
+      <label for="first_name">First Name:</label>
+      <input type="text" name="first_name" value="<%= doctor.first_name %>" required>
+
+      <label for="last_name">Last Name:</label>
+      <input type="text" name="last_name" value="<%= doctor.last_name %>" required>
+
+      <label for="specialization">Specialization:</label>
+      <input type="text" name="specialization" value="<%= doctor.specialization %>" required>
+
+      <label for="email">Email:</label>
+      <input type="email" name="email" value="<%= doctor.email %>" required>
+
+      <label for="phone">Phone:</label>
+      <input type="text" name="phone" value="<%= doctor.phone %>" required>
+
+      <label for="schedule">Schedule (JSON Format):</label>
+      <textarea name="schedule" rows="4" required><%= doctor.schedule %></textarea>
+
+      <button type="submit">Update Doctor</button>
+    </form>
+  </div>
+
+</body>
+</html>

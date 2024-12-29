@@ -1,0 +1,68 @@
+<!-- views/update_profile.ejs -->
+<%- include('layout') %>
+<style>
+  body {
+  font-family: Arial, sans-serif;
+}
+
+.navbar {
+  background-color: #333;
+  padding: 10px;
+}
+
+.navbar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.navbar ul li {
+  display: inline;
+  margin-right: 20px;
+}
+
+.navbar ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+.main-content {
+  margin: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+}
+
+form {
+  margin-top: 20px;
+}  
+</style>
+<h2>Update Your Profile</h2>
+<form action="/doctor/update-profile" method="POST">
+  <label for="first_name">First Name:</label>
+  <input type="text" name="first_name" value="<%= doctor.first_name %>" required><br><br>
+
+  <label for="last_name">Last Name:</label>
+  <input type="text" name="last_name" value="<%= doctor.last_name %>" required><br><br>
+
+  <label for="specialization">Specialization:</label>
+  <input type="text" name="specialization" value="<%= doctor.specialization %>" required><br><br>
+
+  <label for="email">Email:</label>
+  <input type="email" name="email" value="<%= doctor.email %>" required><br><br>
+
+  <label for="phone">Phone:</label>
+  <input type="text" name="phone" value="<%= doctor.phone %>" required><br><br>
+
+  <button type="submit">Update Profile</button>
+</form>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upcoming Appointments</title>
+  <style>
+    /* Resetting some basic styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body and Main Content */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: white;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      padding-top: 20px;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 15px;
+      text-decoration: none;
+      font-size: 18px;
+      transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #575757;
+      border-radius: 5px;
+    }
+
+    .sidebar .active {
+      background-color: #ff6347;
+      border-radius: 5px;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 250px;
+      padding: 40px;
+      flex-grow: 1;
+      background-color: #f9f9f9;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 28px;
+      color: #333;
+    }
+
+    .header p {
+      font-size: 18px;
+      color: #555;
+    }
+
+    /* Table Styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #1e90ff;
+      color: white;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    td button {
+      padding: 8px 16px;
+      background-color: #ff6347;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    td button:hover {
+      background-color: #e74c3c;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: #777;
+      margin-top: 30px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Patient Dashboard</h2>
+    <a href="/dashboard" class="active">Dashboard</a>
+    <a href="/book-appointment">Book Appointment</a>
+    <a href="/appointments">View Appointments</a>
+    <a href="/updateprofile">Update Profile</a>
+    <a href="/chat">Chat with Doctor</a>
+    <a href="#" id="delete-account-link">Delete Account</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <div class="header">
+      <h1>Your Upcoming Appointments</h1>
+      <p>Manage or cancel your appointments here.</p>
+    </div>
+
+    <!-- Appointments Table -->
+    <table>
+      <tr>
+        <th>Doctor</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Status</th>
+        <th>Action</th>
+        <th>Jitsi Link</th>  <!-- Column for Jitsi link -->
+      </tr>
+      <% appointments.forEach(appointment => { %>
+        <tr>
+          <td><%= appointment.doctor_name %></td>
+          <td><%= appointment.appointment_date %></td>
+          <td><%= appointment.appointment_time %></td>
+          <td><%= appointment.status %></td>
+          <td>
+            <% if (appointment.status === 'Scheduled') { %>
+              <form action="/cancel-appointment/<%= appointment.id %>" method="POST">
+                <button type="submit">Cancel</button>
+              </form>
+            <% } %>
+          </td>
+          <td>
+            <% if (appointment.jitsi_link) { %> 
+              <a href="<%= appointment.jitsi_link %>" target="_blank">Join Jitsi Meeting</a>
+            <% } else { %>
+              Not Available
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+    </table>
+
+    <footer>
+      <p>&copy; 2024 Healthcare Management</p>
+    </footer>
+  </div>
+
+  <!-- JavaScript for delete confirmation -->
+  <script>
+    document.getElementById('delete-account-link').addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent default link action
+      const confirmDelete = confirm("Are you sure you want to delete your account? This action is irreversible.");
+      
+      if (confirmDelete) {
+        // Proceed with deleting the account by submitting a form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/delete-profile';
+        document.body.appendChild(form);
+        form.submit();
+      }
+    });
+
+    // Set a timer to refresh the page every minute to check if the Jitsi link should appear
+    setInterval(function() {
+      location.reload(); // Reload the page every 60 seconds to check if Jitsi link should appear
+    }, 60000);  // 60,000ms = 1 minute
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Dashboard - TeleMed</title>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <style>
+    /* Include your styles here or use an external stylesheet */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .profile-info {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .profile-info h2 {
+      margin-bottom: 20px;
+    }
+
+    .profile-info table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    .profile-info table th, .profile-info table td {
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    .update-btn, .delete-btn {
+      padding: 10px 20px;
+      background-color: #ff6347;
+      color: white;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+
+    .update-btn:hover, .delete-btn:hover {
+      background-color: darkred;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Welcome, <%= patient.first_name %>!</h1>
+    <div class="profile-info">
+      <h2>Your Profile</h2>
+      <table>
+        <tr>
+          <th>First Name</th>
+          <td><%= patient.first_name %></td>
+        </tr>
+        <tr>
+          <th>Last Name</th>
+          <td><%= patient.last_name %></td>
+        </tr>
+        <tr>
+          <th>Email</th>
+          <td><%= patient.email %></td>
+        </tr>
+        <tr>
+          <th>Phone</th>
+          <td><%= patient.phone %></td>
+        </tr>
+        <tr>
+          <th>Date of Birth</th>
+          <td><%= patient.date_of_birth %></td>
+        </tr>
+        <tr>
+          <th>Gender</th>
+          <td><%= patient.gender %></td>
+        </tr>
+        <tr>
+          <th>Address</th>
+          <td><%= patient.address %></td>
+        </tr>
+      </table>
+      <div>
+        <a href="/update-profile" class="update-btn">Update Profile</a>
+        <form action="/delete-profile" method="POST" style="display:inline;">
+          <button type="submit" class="delete-btn">Delete Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
+

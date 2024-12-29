@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctors Management</title>
+  <style>
+    /* Same styling as landing page */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Doctors</h1>
+    
+    <h2>Available Doctors</h2>
+    <div class="doctor-list">
+      <% doctors.forEach(function(doctor) { %>
+        <div class="doctor-card">
+          <h3><%= doctor.first_name %> <%= doctor.last_name %></h3>
+          <p><%= doctor.specialization %></p>
+          <p>Email: <%= doctor.email %></p>
+          <p>Phone: <%= doctor.phone %></p>
+          <button onclick="window.location.href='/update-doctor/<%= doctor.id %>'">Update</button>
+          <form action="/delete-doctor/<%= doctor.id %>" method="POST">
+            <button type="submit" style="background-color: red;">Delete</button>
+          </form>
+        </div>
+      <% }); %>
+    </div>
+
+    <form action="/add-doctor" method="POST">
+      <h3>Add a New Doctor</h3>
+      <label for="first_name">First Name:</label>
+      <input type="text" name="first_name" required>
+      
+      <label for="last_name">Last Name:</label>
+      <input type="text" name="last_name" required>
+
+      <label for="specialization">Specialization:</label>
+      <input type="text" name="specialization" required>
+
+      <label for="email">Email:</label>
+      <input type="email" name="email" required>
+
+      <label for="phone">Phone:</label>
+      <input type="text" name="phone" required>
+
+      <button type="submit">Add Doctor</button>
+    </form>
+  </div>
+</body>
+</html>

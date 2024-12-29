@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Dashboard - Healthcare Management</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    /* Resetting some basic styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body and Main Content */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding: 40px;
+      flex-grow: 1;
+      background-color: #f9f9f9;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: white;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      padding-top: 20px;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 15px;
+      text-decoration: none;
+      font-size: 18px;
+      transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #575757;
+      border-radius: 5px;
+    }
+
+    .sidebar .active {
+      background-color: #ff6347;
+      border-radius: 5px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 28px;
+      color: #333;
+    }
+
+    .header p {
+      font-size: 18px;
+      color: #555;
+    }
+
+    /* Notification Styling */
+    .notification {
+      padding: 10px;
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      margin: 5px 0;
+      border-radius: 5px;
+    }
+
+    .notification a {
+      color: #721c24;
+      text-decoration: none;
+    }
+
+    .notification a:hover {
+      text-decoration: underline;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: #777;
+      margin-top: 30px;
+    }
+
+    /* Chat Styling */
+    #messages {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .message {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+    }
+
+    .message.sender {
+      background-color: #e1f5fe;
+    }
+
+    .message.receiver {
+      background-color: #f1f8e9;
+    }
+
+    #message-input {
+      width: 80%;
+      padding: 10px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Doctor Dashboard</h2>
+    <a href="/doctor/dashboard" class="active">Dashboard</a>
+    <a href="/doctor/update-profile">Update Profile</a>
+    <a href="/doctor/update-schedule">Update Schedule</a>
+    <a href="/doctor/chat">Chat</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <h1>Welcome, <%= doctor.first_name %> <%= doctor.last_name %>!</h1>
+      <p>Manage your appointments, chat with patients, or update your profile.</p>
+    </div>
+
+    <!-- Notifications Section -->
+    <div class="notifications">
+      <% if (notifications.length > 0) { %>
+        <ul>
+          <% notifications.forEach(notification => { %>
+            <li class="notification">
+              <h2>Chat with Patient: <%= notification.first_name %> <%= notification.last_name %></h2>
+              <p>Unread Messages: <%= notification.unreadMessages %></p>
+              <a href="/doctor/chat/history/<%= notification.patientId %>">View Chat</a>
+
+            </li>
+          <% }); %>
+        </ul>
+      <% } else { %>
+        <p>No unread messages.</p>
+      <% } %>
+    </div>
+
+    <!-- Chat Container -->
+    <div id="messages">
+      <!-- Messages will be dynamically injected here -->
+    </div>
+
+
+    <footer>
+      <p>&copy; 2024 Healthcare Management</p>
+    </footer>
+  </div>
+
+  <script>
+    const socket = io.connect();  // Connect to the server
+
+    const doctorId = '<%= doctor.id %>';
+    const patientId = '<%= patientId %>'; // Now this will be properly defined
+
+    // Join the chat with doctorId and patientId
+    socket.emit('join', doctorId);
+
+    // Handle sending messages
+    document.getElementById('chat-form').onsubmit = (e) => {
+      e.preventDefault();
+      const message = document.getElementById('message-input').value;
+
+      // Emit the message to the server
+      socket.emit('sendMessage', { sender: doctorId, receiver: patientId, message: message });
+      document.getElementById('message-input').value = ''; // Clear the input
+    };
+
+    // Handle receiving messages
+    socket.on('receiveMessage', (data) => {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message');
+      messageDiv.classList.add(data.sender === doctorId ? 'sender' : 'receiver');
+      messageDiv.innerHTML = `<strong>${data.sender}</strong>: ${data.message}`;
+      document.getElementById('messages').appendChild(messageDiv);
+    });
+
+    // Fetch previous messages from the server
+async function fetchChatHistory() {
+  try {
+    const response = await fetch(`/doctor/chat/history/${patientId}`);  // Pass patientId only
+    const data = await response.json();
+    const messagesDiv = document.getElementById('messages');
+    
+    // Display previous messages
+    data.messages.forEach(message => {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message');
+      messageDiv.classList.add(message.sender === doctorId ? 'sender' : 'receiver');
+      messageDiv.innerHTML = `<strong>${message.sender}</strong>: ${message.message}`;
+      messagesDiv.appendChild(messageDiv);
+    });
+  } catch (error) {
+    console.error('Error fetching chat history:', error);
+  }
+}
+
+// Fetch previous messages when the page loads
+fetchChatHistory();

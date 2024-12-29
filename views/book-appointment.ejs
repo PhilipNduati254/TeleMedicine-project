@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Appointment - TeleMed</title>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <style>
+    /* Resetting some basic styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body and Main Content */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: white;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      padding-top: 20px;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 15px;
+      text-decoration: none;
+      font-size: 18px;
+      transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #575757;
+      border-radius: 5px;
+    }
+
+    .sidebar .active {
+      background-color: #ff6347;
+      border-radius: 5px;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 250px;
+      padding: 40px;
+      flex-grow: 1;
+      background-color: #f9f9f9;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 28px;
+      color: #333;
+    }
+
+    .header p {
+      font-size: 18px;
+      color: #555;
+    }
+
+    .appointment-form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .appointment-form h2 {
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      font-weight: bold;
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    .form-group input[type="date"],
+    .form-group input[type="time"] {
+      width: 48%;
+      display: inline-block;
+    }
+
+    .form-group input[type="time"] {
+      margin-left: 4%;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      background-color: #ff6347;
+      color: white;
+      border-radius: 5px;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: darkred;
+    }
+
+    .error {
+      color: red;
+      margin-bottom: 20px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: #777;
+      margin-top: 30px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Patient Dashboard</h2>
+    <a href="/dashboard" class="active">Dashboard</a>
+    <a href="/book-appointment">Book Appointment</a>
+    <a href="/appointment">View Appointments</a>
+    <a href="/updateprofile">Update Profile</a>
+    <a href="/chat" >Chat with Doctor</a>
+    <a href="#" id="delete-account-link">Delete Account</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <div class="header">
+      <h1>Book an Appointment</h1>
+      <p>Choose a doctor and select an appointment date and time.</p>
+    </div>
+
+    <!-- Error message display -->
+    <% if (error) { %>
+      <div class="error">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <!-- Appointment Booking Form -->
+    <div class="appointment-form">
+      <h2>Choose Doctor and Appointment Details</h2>
+      <form action="/book-appointment" method="POST">
+        <div class="form-group">
+          <label for="doctor_id">Select Doctor:</label>
+          <select name="doctor_id" id="doctor_id" class="form-control" required>
+            <% doctors.forEach(doctor => { %>
+              <option value="<%= doctor.id %>">
+                <%= doctor.first_name %> <%= doctor.last_name %> - <%= doctor.specialization %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="appointment_date">Appointment Date:</label>
+          <input type="date" name="appointment_date" id="appointment_date" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label for="appointment_time">Appointment Time:</label>
+          <input type="time" name="appointment_time" id="appointment_time" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn">Book Appointment</button>
+      </form>
+    </div>
+
+    <footer>
+      <p>&copy; 2024 Healthcare Management</p>
+    </footer>
+  </div>
+
+  <!-- JavaScript for delete confirmation -->
+  <script>
+    document.getElementById('delete-account-link').addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent default link action
+      const confirmDelete = confirm("Are you sure you want to delete your account? This action is irreversible.");
+      
+      if (confirmDelete) {
+        // Proceed with deleting the account by submitting a form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/delete-profile';
+        document.body.appendChild(form);
+        form.submit();
+      }
+    });
+  </script>
+
+</body>
+</html>

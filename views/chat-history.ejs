@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Chat History</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f7fb;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: white;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      padding-top: 20px;
+      padding-left: 15px;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 15px;
+      text-decoration: none;
+      font-size: 18px;
+      transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #575757;
+      border-radius: 5px;
+    }
+
+    .sidebar .active {
+      background-color: #ff6347;
+      border-radius: 5px;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      margin-left: 250px;
+      padding: 40px;
+      flex-grow: 1;
+      background-color: #f9f9f9;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* Chat Container */
+    .chat-box {
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background-color: #fff;
+      padding: 20px;
+      width: 80%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Message Styling */
+    .message {
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      line-height: 1.4;
+      max-width: 75%;
+      word-wrap: break-word;
+    }
+
+    /* Doctor's Message */
+    .sender {
+      background-color: #f0f0f0;
+      text-align: left;
+      margin-right: auto;
+    }
+
+    /* Patient's Message */
+    .receiver {
+      background-color: #e1ffe1;
+      text-align: right;
+      margin-left: auto;
+    }
+
+    /* Message Input and Button */
+    .input-container {
+      display: flex;
+      justify-content: space-between;
+      width: 80%;
+      margin-top: 20px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #message-input {
+      width: 80%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    #message-input:focus {
+      border-color: #ff6347;
+    }
+
+    #send-btn {
+      background-color: #ff6347;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #send-btn:hover {
+      background-color: #e55347;
+    }
+
+    /* Scroll Bar Customization */
+    .chat-box::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .chat-box::-webkit-scrollbar-thumb {
+      background-color: #ddd;
+      border-radius: 4px;
+    }
+
+    .chat-box::-webkit-scrollbar-track {
+      background-color: #f1f1f1;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #555;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Doctor Dashboard</h2>
+    <a href="/doctor/dashboard" class="active">Dashboard</a>
+    <a href="/doctor/update-profile">Update Profile</a>
+    <a href="/doctor/update-schedule">Update Schedule</a>
+    <a href="/doctor/chat">Chat</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <h1>Chat History with Patient: <%= patientId %></h1>
+      <p>Doctor ID: <%= doctorId %></p> <!-- Render doctorId here -->
+    </div>
+
+    <!-- Display Chat Messages -->
+    <div class="chat-box" id="messages">
+      <% messages.forEach(message => { %>
+        <div class="message <%= message.sender === 'doctor' ? 'sender' : 'receiver' %>">
+          <strong><%= message.sender === 'doctor' ? 'You' : 'Patient' %>:</strong>
+          <p><%= message.message %></p>
+          <span class="message-time"><%= new Date(message.timestamp).toLocaleString() %></span>
+        </div>
+      <% }); %>
+    </div>
+
+    <!-- Chat Form -->
+    <form id="chat-form">
+      <input type="text" id="message-input" placeholder="Type a message..." required>
+      <button type="submit" id="send-btn">Send</button>
+    </form>
+
+    <footer>
+      <p>&copy; 2024 Healthcare Management</p>
+    </footer>
+  </div>
+
+  <script>
+    const socket = io.connect();  // Connect to the server
+    const doctorId = '<%= doctorId %>';  // Doctor ID passed from backend
+    const patientId = '<%= patientId %>';
+  
+    // Join the chat
+    socket.emit('join', doctorId);
+  
+    // Sending a message
+ document.getElementById('chat-form').onsubmit = (e) => {
+  e.preventDefault();
+
+  const message = document.getElementById('message-input').value;
+
+  // Send the message via Socket.IO
+  socket.emit('sendMessage', { sender: doctorId, receiver: patientId, message: message });
+
+  // Send the message to the server to save it in the database
+  fetch('/doctor/chat/send-message', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      doctorId: doctorId,
+      patientId: patientId,  // Ensure the patientId is correctly passed here
+      text: message,
+    }),
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    if (data.success) {
+      console.log('Message sent and saved successfully');
+    } else {
+      console.log('Failed to send message');
+    }
+  })
+  .catch((error) => {
+    console.error('Error sending message:', error);
+  });
+
+  // Clear input
+  document.getElementById('message-input').value = '';
+};
+
+  
+    // Receiving a message from the patient
+ // Receiving a message from the patient
+socket.on('receiveMessage', (data) => {
+  const messageDiv = document.createElement('div');
+  messageDiv.classList.add('message');
+  messageDiv.classList.add(data.sender === 'doctor' ? 'sender' : 'receiver');
+  messageDiv.innerHTML = `<strong>${data.sender === 'doctor' ? 'You' : 'Patient'}</strong>: ${data.message}`;
+  document.getElementById('messages').appendChild(messageDiv);
+});
+
+  </script>
+  
+</body>
+</html>

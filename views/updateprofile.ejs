@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Update Profile - TeleMed</title>
+  <style>
+    /* Resetting some basic styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Body and Main Content */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: white;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      padding-top: 20px;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 15px;
+      text-decoration: none;
+      font-size: 18px;
+      transition: background-color 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #575757;
+      border-radius: 5px;
+    }
+
+    .sidebar .active {
+      background-color: #ff6347;
+      border-radius: 5px;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 250px;
+      padding: 40px;
+      flex-grow: 1;
+      background-color: #f9f9f9;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 28px;
+      color: #333;
+    }
+
+    .header p {
+      font-size: 18px;
+      color: #555;
+    }
+
+    /* Form Container */
+    .form-container {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .form-container h2 {
+      margin-bottom: 20px;
+    }
+
+    .form-container label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .form-container input, .form-container select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    .form-container button {
+      padding: 10px 20px;
+      background-color: #1e90ff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .form-container button:hover {
+      background-color: #ff6347;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: #777;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Patient Dashboard</h2>
+    <a href="/dashboard" class="active">Dashboard</a>
+    <a href="/book-appointment">Book Appointment</a>
+    <a href="/appointment">View Appointments</a>
+    <a href="/updateprofile">Update Profile</a>
+    <a href="/chat" >Chat with Doctor</a>
+    <a href="#" id="delete-account-link">Delete Account</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <div class="header">
+      <h1>Update Your Profile</h1>
+      <p>Update your personal information here.</p>
+    </div>
+
+    <div class="form-container">
+      <form action="/updateprofile" method="POST">
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name" value="<%= patient.first_name %>" required>
+
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name" value="<%= patient.last_name %>" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="<%= patient.email %>" required>
+
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" value="<%= patient.phone %>" required>
+
+        <label for="date_of_birth">Date of Birth:</label>
+        <input type="date" id="date_of_birth" name="date_of_birth" value="<%= patient.date_of_birth %>" required>
+
+        <label for="gender">Gender:</label>
+        <select id="gender" name="gender" required>
+          <option value="Male" <%= patient.gender === 'Male' ? 'selected' : '' %>>Male</option>
+          <option value="Female" <%= patient.gender === 'Female' ? 'selected' : '' %>>Female</option>
+          <option value="Other" <%= patient.gender === 'Other' ? 'selected' : '' %>>Other</option>
+        </select>
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" value="<%= patient.address %>" required>
+
+        <button type="submit">Update Profile</button>
+      </form>
+    </div>
+
+    <footer>
+      <p>&copy; 2024 Healthcare Management</p>
+    </footer>
+  </div>
+
+  <!-- JavaScript for delete confirmation -->
+  <script>
+    document.getElementById('delete-account-link').addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent default link action
+      const confirmDelete = confirm("Are you sure you want to delete your account? This action is irreversible.");
+      
+      if (confirmDelete) {
+        // Proceed with deleting the account by submitting a form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/delete-profile';
+        document.body.appendChild(form);
+        form.submit();
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: white;
+      padding: 20px;
+      height: 100vh;
+      position: fixed;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+      color: #fff;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 10px;
+      margin: 10px 0;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    .sidebar a:hover {
+      background-color: #575757;
+      border-radius: 5px;
+    }
+
+    .main-content {
+      margin-left: 270px;
+      padding: 40px;
+      flex: 1;
+      background-color: #f4f4f4;
+    }
+
+    .main-content h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .welcome-message {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #333;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .no-appointments {
+      margin-top: 20px;
+      color: #666;
+    }
+
+    .join-link {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .join-link:hover {
+      text-decoration: underline;
+    }
+
+    @media screen and (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Doctor Dashboard</h2>
+    <a href="/doctor/dashboard">Dashboard</a>
+    <a href="/doctor/update-profile">Update Profile</a>
+    <a href="/doctor/update-schedule">Update Schedule</a>
+    <a href="/doctor/chat">Chat with patient</a>
+    <a href="/logout">Logout</a>
+  </div>
+
+  <div class="main-content">
+    <!-- Welcome Message -->
+    <div class="welcome-message">
+      <h1>Welcome, <%= firstName %> <%= lastName %>!</h1>
+    </div>
+
+    <h2>Upcoming Appointments</h2>
+
+    <% if (appointments.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Patient Name</th>
+            <th>Appointment Date</th>
+            <th>Appointment Time</th>
+            <th>Status</th>
+            <th>Join Meeting</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% appointments.forEach(appointment => { %>
+            <tr>
+              <td><%= appointment.patient_first_name %> <%= appointment.patient_last_name %></td>
+              <td><%= new Date(appointment.appointment_date).toLocaleDateString() %></td>
+              <td><%= appointment.appointment_time %></td>
+              <td><%= appointment.status %></td>
+              <td>
+                <% if (appointment.jitsiLink) { %>
+                  <a class="join-link" href="<%= appointment.jitsiLink %>" target="_blank">Join Meeting</a>
+                <% } else { %>
+                  <span>Link not available</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p class="no-appointments">No upcoming appointments.</p>
+    <% } %>
+  </div>
+
+</body>
+</html>
+
